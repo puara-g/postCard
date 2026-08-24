@@ -346,6 +346,13 @@ button.cta:focus-visible{ outline:3px solid var(--stripe-blue); outline-offset:2
   border:1px solid var(--line);
 }
 .detail-panel.open{ display:block; }
+
+/* 토글 버튼 없이 항상 펼쳐진 궁합 보기 패널: 위아래로 넉넉하게 띄움 */
+#comparePanel{
+  margin-top:28px;
+  margin-bottom:28px;
+}
+
 .detail-block{ margin-bottom:16px; }
 .detail-block h4{
   font-family:"Gamja Flower",cursive; font-size:1.05rem; color:var(--accent);
