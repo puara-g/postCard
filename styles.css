@@ -112,6 +112,7 @@ header.hero{
   font-size:0.88rem;
   color:var(--ink-soft);
   margin-bottom:6px;
+  white-space:nowrap;
 }
 .row2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 input[type="text"], input[type="date"], input[type="time"]{
