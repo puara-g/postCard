@@ -887,9 +887,19 @@ document.getElementById('shareBtn').addEventListener('click', async ()=>{
   const ownerLabel = name || '이 사람';
 
   compareClosedLabel = `${withWa(ownerLabel)} 궁합 보기`;
-  document.getElementById('compareToggleLabel').textContent = compareClosedLabel;
   document.getElementById('compareIntro').textContent = `${ownerLabel}의 사주와 내 사주를 비교해보려면, 내 생년월일을 넣어보세요.`;
-  document.getElementById('compareToggle').style.display = '';
+
+  // 링크로 들어온 경우, 궁합 보기를 결과 카드 맨 위로 옮기고 바로 펼쳐서 보여줌
+  const resultCard = document.getElementById('result');
+  const airmailEdge = resultCard.querySelector('.airmail-edge');
+  const compareToggleEl = document.getElementById('compareToggle');
+  const comparePanelEl = document.getElementById('comparePanel');
+  const insertAfter = airmailEdge ? airmailEdge.nextSibling : resultCard.firstChild;
+  resultCard.insertBefore(compareToggleEl, insertAfter);
+  resultCard.insertBefore(comparePanelEl, compareToggleEl.nextSibling);
+  comparePanelEl.classList.add('open');
+  compareToggleEl.setAttribute('aria-expanded', 'true');
+  document.getElementById('compareToggleLabel').textContent = '접어두기';
 
   document.getElementById('fdate').value = `${b.slice(0,4)}-${b.slice(4,6)}-${b.slice(6,8)}`;
   document.getElementById('fname').value = name;
