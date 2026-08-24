@@ -651,17 +651,35 @@ const COMPAT_CLOSING = [
   "궁합은 참고만 하고, 진짜 케미는 함께 보내는 시간이 만들어가는 거니까요.",
   "오늘 이 인연도 나름의 결이 있다는 것만 기억해두면 좋겠어요."
 ];
+const ELEM_COMPLEMENT_TEXT = {
+  aFilled: [
+    (nameA,nameB,elem)=>`${withE(nameA)} 부족했던 ${elem} 기운을, ${withGa(nameB)} 넉넉하게 채워줄 수 있어요.`,
+    (nameA,nameB,elem)=>`${withGa(nameB)} 가진 ${elem} 기운이 ${withE(nameA)} 딱 필요했던 부분을 채워줘요.`,
+    (nameA,nameB,elem)=>`${withE(nameA)} 아쉬웠던 ${elem} 기운을, ${withGa(nameB)} 자연스럽게 보완해주는 사이예요.`
+  ],
+  sameDominant: [
+    (nameA,nameB,elem)=>`둘 다 ${elem} 기운이 강한 편이라, 통하는 부분이 많을 거예요.`,
+    (nameA,nameB,elem)=>`${elem} 기운이 강하다는 공통점이 있어요. 비슷한 방식으로 세상을 대하는 사이예요.`,
+    (nameA,nameB,elem)=>`둘 다 ${elem} 기운이 짙은 편이에요. 같은 파장이라 이해가 빠른 관계예요.`
+  ],
+  different: [
+    ()=>`서로 다른 기운을 갖고 있어요. 다름을 있는 그대로 즐기면 더 좋은 사이가 될 수 있어요.`,
+    (nameA,nameB)=>`${withGa(nameA)} ${withGa(nameB)} 서로 다른 결의 기운을 갖고 있어요. 다른 만큼 서로에게 신선한 자극이 될 수 있어요.`,
+    ()=>`기운의 결이 서로 다른 관계예요. 맞춰가는 재미가 있는 사이가 될 거예요.`
+  ]
+};
 function elemComplementText(nameA, nameB, chartA, chartB){
+  const seed = chartA.dp.branchIdx*4 + chartB.dp.branchIdx*2 + chartA.dayStemIdx;
   if(chartA.lackIdx>=0 && chartB.ohengCnt[chartA.lackIdx]>0 && chartB.dominantElemIdx===chartA.lackIdx){
-    return `${withE(nameA)} 부족했던 ${ELEM_NAMES[chartA.lackIdx]} 기운을, ${withGa(nameB)} 넉넉하게 채워줄 수 있어요.`;
+    return pick(ELEM_COMPLEMENT_TEXT.aFilled, seed)(nameA, nameB, ELEM_NAMES[chartA.lackIdx]);
   }
   if(chartB.lackIdx>=0 && chartA.ohengCnt[chartB.lackIdx]>0 && chartA.dominantElemIdx===chartB.lackIdx){
-    return `${withE(nameB)} 부족했던 ${ELEM_NAMES[chartB.lackIdx]} 기운을, ${withGa(nameA)} 넉넉하게 채워줄 수 있어요.`;
+    return pick(ELEM_COMPLEMENT_TEXT.aFilled, seed)(nameB, nameA, ELEM_NAMES[chartB.lackIdx]);
   }
   if(chartA.dominantElemIdx===chartB.dominantElemIdx){
-    return `둘 다 ${ELEM_NAMES[chartA.dominantElemIdx]} 기운이 강한 편이라, 통하는 부분이 많을 거예요.`;
+    return pick(ELEM_COMPLEMENT_TEXT.sameDominant, seed)(nameA, nameB, ELEM_NAMES[chartA.dominantElemIdx]);
   }
-  return `서로 다른 기운을 갖고 있어요. 다름을 있는 그대로 즐기면 더 좋은 사이가 될 수 있어요.`;
+  return pick(ELEM_COMPLEMENT_TEXT.different, seed)(nameA, nameB);
 }
 
 /* 십성 관계 + 오행 상호보완을 바탕으로 계산하는 궁합 점수(60~99) */
