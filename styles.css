@@ -38,6 +38,8 @@ body{
   font-family:"Gowun Dodum","Apple SD Gothic Neo",sans-serif;
   line-height:1.7;
   font-size:16px;
+  word-break:keep-all;
+  overflow-wrap:break-word;
 }
 ::selection{ background:var(--accent-soft); }
 a{ color:var(--stripe-blue); }
