@@ -85,13 +85,13 @@
       <button type="button" class="refresh-btn" id="todayRefresh">오늘 날짜로 새로고침</button>
     </div>
 
-    <button type="button" class="detail-toggle" id="compareToggle" aria-expanded="false" style="display:none;">
+    <button type="button" class="detail-toggle" id="compareToggle" aria-expanded="false">
       <span id="compareToggleLabel">다른 사람과 궁합 보기</span><span class="arrow">▾</span>
     </button>
     <div class="detail-panel" id="comparePanel">
       <div class="detail-block">
         <h4>궁합 보기</h4>
-        <p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:12px;" id="compareIntro">비교해보고 싶은 사람의 생년월일을 넣어보세요.</p>
+        <p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:12px;" id="compareIntro">비교해보고 싶은 사람의 생년월일을 넣어보세요. 결과는 아래 궁합 방명록에 자동으로 남아요.</p>
         <form id="compareForm">
           <div class="field">
             <label for="cfname">이름 <span style="opacity:.6">(선택)</span></label>
@@ -112,7 +112,6 @@
         </form>
         <div id="compareOutput"></div>
         <button type="button" class="save-compat-btn" id="saveCompareBtn">💾 이 궁합 저장하기</button>
-        <button type="button" class="save-compat-btn" id="publishCompatBtn" style="display:none;"></button>
 
         <div class="saved-list" id="savedListWrap" style="display:none;">
           <div class="saved-list-title">저장한 궁합 <span style="opacity:.7">(이 브라우저에서만 보여요)</span></div>
@@ -143,7 +142,7 @@
     사주엽서는 명리학 이론(십성·오행·절기)을 규칙에 따라 계산해 재미로 풀어드리는 서비스예요.<br>
     자시 기준(23시~01시)과 진태양시 보정은 유파에 따라 다르게 볼 수 있어요. 인생의 중요한 결정은 여러 관점을 참고해서 내려주세요.<br>
     공유 링크에는 입력한 생년월일시(와 이름)가 그대로 담겨요. 링크는 저장되지 않고 여는 사람의 브라우저에서만 계산돼요.<br>
-    "저장한 궁합"은 지금 쓰는 이 브라우저에만 남는 개인용 보관함이고, "궁합 방명록"은 이 엽서 링크를 아는 사람이라면 누구나 볼 수 있는 공개 기록이에요. 방명록에 남길 땐 이 점을 참고해주세요.
+"저장한 궁합"은 지금 쓰는 이 브라우저에만 남는 개인용 보관함이에요. 반면 "궁합 보기"를 실행하면 그 결과는 자동으로 궁합 방명록에 남아, 이 엽서 링크를 아는 사람이라면 누구나 볼 수 있는 공개 기록이 돼요.
   </p>
 </div>
 

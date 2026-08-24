@@ -617,21 +617,12 @@ document.getElementById('compareForm').addEventListener('submit', (e)=>{
   saveBtn.disabled = false;
   saveBtn.textContent = '💾 이 궁합 저장하기';
 
-  const publishBtn = document.getElementById('publishCompatBtn');
-  if(openedViaShareLink){
-    const today = new Intl.DateTimeFormat('ko-KR', { timeZone:'Asia/Seoul', year:'numeric', month:'2-digit', day:'2-digit' }).format(new Date());
-    pendingPublishEntry = {
-      forName: nameA, nameA, nameB, pillarA, pillarB,
-      stampA: stampMap[chartA.dominantElemIdx], stampB: stampMap[chartB.dominantElemIdx],
-      relText, elemText, closing, submittedAt: today
-    };
-    publishBtn.style.display = 'inline-flex';
-    publishBtn.disabled = false;
-    publishBtn.textContent = `💌 ${nameA}에게 이 결과 남기고 가기`;
-  } else {
-    publishBtn.style.display = 'none';
-    pendingPublishEntry = null;
-  }
+  const today = new Intl.DateTimeFormat('ko-KR', { timeZone:'Asia/Seoul', year:'numeric', month:'2-digit', day:'2-digit' }).format(new Date());
+  publishCompatEntry({
+    forName: nameA, nameA, nameB, pillarA, pillarB,
+    stampA: stampMap[chartA.dominantElemIdx], stampB: stampMap[chartB.dominantElemIdx],
+    relText, elemText, closing, submittedAt: today
+  });
 });
 
 /* =======================================================
@@ -723,7 +714,6 @@ renderSavedCompatList();
    궁합 방명록 (Supabase에 저장되어 모두에게 공유되는 기록)
    ======================================================= */
 let openedViaShareLink = false;
-let pendingPublishEntry = null;
 
 const supabaseClient = (typeof window.supabase !== 'undefined'
   && typeof SUPABASE_URL === 'string' && SUPABASE_URL && !SUPABASE_URL.includes('YOUR-PROJECT'))
@@ -783,18 +773,11 @@ function renderCompatBook(){
 }
 loadCompatBook();
 
-async function publishCompatEntry(entry, btn){
-  const originalLabel = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = '남기는 중...';
-
+async function publishCompatEntry(entry){
   if(!supabaseClient){
     showToast('방명록 저장소가 아직 설정되지 않았어요. supabase-config.js를 확인해주세요.');
-    btn.disabled = false;
-    btn.textContent = originalLabel;
     return;
   }
-
   try{
     const { error } = await supabaseClient.from('compat_entries').insert({
       for_name: entry.forName || null,
@@ -808,19 +791,11 @@ async function publishCompatEntry(entry, btn){
     compatBook.unshift(entry);
     if(compatBook.length > 30) compatBook.length = 30;
     renderCompatBook();
-    showToast(`방명록에 남겼어요! ${entry.forName || '상대방'}이 나중에 이 링크를 열면 볼 수 있어요.`);
-    btn.textContent = '💌 남겼어요';
+    showToast('궁합이 방명록에 자동으로 남았어요.');
   }catch(err){
-    showToast('저장에 실패했어요. 잠시 후 다시 시도해주세요.');
-    btn.disabled = false;
-    btn.textContent = originalLabel;
+    showToast('방명록 저장에 실패했어요. 잠시 후 다시 시도해주세요.');
   }
 }
-
-document.getElementById('publishCompatBtn').addEventListener('click', ()=>{
-  if(!pendingPublishEntry) return;
-  publishCompatEntry(pendingPublishEntry, document.getElementById('publishCompatBtn'));
-});
 
 const bookToggle = document.getElementById('bookToggle');
 const bookPanel = document.getElementById('bookPanel');
