@@ -617,6 +617,7 @@ function compatDetailHTML(r){
   `;
 }
 function showCompatDetail(r){
+  document.getElementById('comparePanel').classList.add('open');
   const out = document.getElementById('compareOutput');
   out.innerHTML = compatDetailHTML(r);
   out.classList.add('show');
