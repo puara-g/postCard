@@ -247,7 +247,10 @@ const CLOSING_TEXT = [
   "오늘 하루도, 타고난 결 그대로 자연스럽게 흘러가길 바라요.",
   "가진 기운을 너무 억누르지 말고, 오늘은 자기 편이 되어주는 하루였으면 해요.",
   "완벽하지 않아도 괜찮아요. 지금의 결 그대로도 이미 충분히 잘 하고 있어요.",
-  "오늘 엽서가 작은 위로나 응원 한 조각이 되었으면 좋겠어요."
+  "오늘 엽서가 작은 위로나 응원 한 조각이 되었으면 좋겠어요.",
+  "무엇을 타고났든, 그 결을 아는 것만으로도 오늘 하루가 조금은 더 편해질 거예요.",
+  "이 결이 정답은 아니지만, 나를 이해하는 작은 힌트가 되었으면 해요.",
+  "타고난 기운을 탓하기보다, 오늘은 그 기운과 잘 지내보는 하루가 되길 바라요."
 ];
 
 const TODAY_SIPSEONG_TEXT = {
@@ -316,6 +319,15 @@ const ELEM_TODAY_OVER = {
          "수(水) 기운이 오늘 한층 더 깊어지는 날이에요. 이 생각 저 생각에 휩쓸리지 않게 우선순위를 정해봐요.",
          "가뜩이나 풍부한 수(水) 기운이 오늘 넘치는 날이에요. 결정을 미루기보다 한 번은 매듭을 지어봐요."]
 };
+/* 십성/오행 문단과 별개로, 매일 독립적으로 뽑혀 붙는 한마디 — 조합만으로 변주를 늘려줌 */
+const TODAY_TAIL_TEXT = [
+  "오늘 하루, 계획한 것 중 하나만 제대로 해내도 충분해요.",
+  "무리한 일정보다는, 나에게 맞는 속도를 지키는 게 좋은 하루예요.",
+  "작은 컨디션 변화에도 귀 기울이면 하루가 한결 편해질 거예요.",
+  "오늘은 남과 비교하지 말고, 어제의 나보다 조금 나은 하루면 충분해요.",
+  "예상 밖의 일이 생기더라도, 당황하지 않고 흐름을 따라가면 괜찮을 거예요.",
+  "하루 끝에 스스로를 다독이는 한마디를 남겨보는 것도 좋겠어요."
+];
 
 function pick(arr, seed){ return arr[mod(seed, arr.length)]; }
 
@@ -570,6 +582,9 @@ function renderToday(){
     paras.push(pick(ELEM_TODAY_OVER[ELEM_VARS[todayBranchElemIdx]], todaySeed));
   }
 
+  const tailSeed = todayDP.stemIdx*13 + todayDP.branchIdx*17 + lastChart.dayStemIdx*3;
+  paras.push(pick(TODAY_TAIL_TEXT, tailSeed));
+
   document.getElementById('todayBody').innerHTML = paras.map(p=>`<p>${p}</p>`).join('');
   document.getElementById('todayGanji').innerHTML =
     `${STEMS[todayDP.stemIdx]}${BRANCHES[todayDP.branchIdx]}<span class="hj">${STEM_HANJA[todayDP.stemIdx]}${BRANCH_HANJA[todayDP.branchIdx]}일</span>`;
@@ -649,7 +664,10 @@ const COMPAT_TEXT = {
 const COMPAT_CLOSING = [
   "잘 맞고 안 맞고보다, 서로 다른 결을 알아가는 재미가 있는 사이예요.",
   "궁합은 참고만 하고, 진짜 케미는 함께 보내는 시간이 만들어가는 거니까요.",
-  "오늘 이 인연도 나름의 결이 있다는 것만 기억해두면 좋겠어요."
+  "오늘 이 인연도 나름의 결이 있다는 것만 기억해두면 좋겠어요.",
+  "결이 다르다고 안 맞는 건 아니에요. 서로를 알아가는 데 조금 더 마음을 쓰면 충분해요.",
+  "오늘 본 궁합은 참고용이에요. 두 사람이 함께 채워가는 시간이 진짜 궁합을 만들어요.",
+  "숫자보다 중요한 건, 오늘 이 인연을 어떻게 대하느냐일 거예요."
 ];
 const ELEM_COMPLEMENT_TEXT = {
   aFilled: [
