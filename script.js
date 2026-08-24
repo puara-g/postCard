@@ -832,7 +832,12 @@ document.getElementById('compareForm').addEventListener('submit', (e)=>{
   saveBtn.textContent = '💾 이 궁합 저장하기';
 
   const today = new Intl.DateTimeFormat('ko-KR', { timeZone:'Asia/Seoul', year:'numeric', month:'2-digit', day:'2-digit' }).format(new Date());
-  publishCompatEntry({ ...record, forName: nameA, submittedAt: today });
+  const fingerprint = `${nameA}|${nameB}|${dateVal}|${hasTime ? cTimeInput.value : 'no-time'}`;
+  if(!hasPublishedCompat(fingerprint) && !pendingCompatFingerprints.has(fingerprint)){
+    pendingCompatFingerprints.add(fingerprint);
+    publishCompatEntry({ ...record, forName: nameA, submittedAt: today }, fingerprint)
+      .finally(()=> pendingCompatFingerprints.delete(fingerprint));
+  }
 });
 
 /* =======================================================
@@ -984,7 +989,27 @@ function renderCompatBook(){
 }
 loadCompatBook();
 
-async function publishCompatEntry(entry){
+/* 같은 브라우저에서 같은 조합(이름+생년월일)을 다시 조회해도 방명록에 중복으로 올라가지 않도록 기록해둠 */
+const PUBLISHED_COMPAT_KEY = 'sajuyeopseo_published_compat_v1';
+const pendingCompatFingerprints = new Set();
+function hasPublishedCompat(fingerprint){
+  try{
+    const raw = localStorage.getItem(PUBLISHED_COMPAT_KEY);
+    const list = raw ? JSON.parse(raw) : [];
+    return Array.isArray(list) && list.includes(fingerprint);
+  }catch(err){ return false; }
+}
+function markPublishedCompat(fingerprint){
+  try{
+    const raw = localStorage.getItem(PUBLISHED_COMPAT_KEY);
+    const list = raw ? JSON.parse(raw) : [];
+    const next = (Array.isArray(list) ? list : []).filter(fp=>fp!==fingerprint);
+    next.push(fingerprint);
+    localStorage.setItem(PUBLISHED_COMPAT_KEY, JSON.stringify(next.slice(-50)));
+  }catch(err){ /* 저장 불가 환경은 조용히 무시 */ }
+}
+
+async function publishCompatEntry(entry, fingerprint){
   if(!supabaseClient){
     showToast('방명록 저장소가 아직 설정되지 않았어요. supabase-config.js를 확인해주세요.');
     return;
@@ -1000,6 +1025,7 @@ async function publishCompatEntry(entry){
       submitted_at: entry.submittedAt
     });
     if(error) throw error;
+    if(fingerprint) markPublishedCompat(fingerprint);
     compatBook.unshift(entry);
     if(compatBook.length > 30) compatBook.length = 30;
     renderCompatBook();
