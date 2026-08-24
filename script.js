@@ -579,24 +579,24 @@ function elemComplementText(nameA, nameB, chartA, chartB){
 }
 
 /* 십성 관계 + 오행 상호보완을 바탕으로 계산하는 궁합 점수(60~99) */
-const SIPSEONG_SCORE_BASE = { "비겁":78, "식상":88, "재성":82, "관성":70, "인성":90 };
+const SIPSEONG_SCORE_BASE = { "비겁":60, "식상":80, "재성":70, "관성":45, "인성":88 };
 function compatScore(chartA, chartB){
   const ss = sipseongOf(chartA.dayStemIdx, chartB.dayStemIdx);
   const group = SIPSEONG_GROUP[ss];
-  let score = group ? SIPSEONG_SCORE_BASE[group] : 75;
+  let score = group ? SIPSEONG_SCORE_BASE[group] : 65;
 
   if(chartA.lackIdx>=0 && chartB.ohengCnt[chartA.lackIdx]>0 && chartB.dominantElemIdx===chartA.lackIdx){
-    score += 8;
+    score += 12;
   } else if(chartB.lackIdx>=0 && chartA.ohengCnt[chartB.lackIdx]>0 && chartA.dominantElemIdx===chartB.lackIdx){
-    score += 8;
+    score += 12;
   } else if(chartA.dominantElemIdx===chartB.dominantElemIdx){
-    score -= 4;
+    score -= 15;
   }
 
-  const wiggle = mod(chartA.dp.branchIdx*5 + chartB.dp.branchIdx*3 + chartB.dayStemIdx, 11) - 5;
+  const wiggle = mod(chartA.dp.branchIdx*5 + chartB.dp.branchIdx*3 + chartB.dayStemIdx, 25) - 12;
   score += wiggle;
 
-  return Math.max(60, Math.min(99, score));
+  return Math.max(15, Math.min(99, score));
 }
 
 /* 궁합 결과 카드 HTML — 궁합 보기 직후 / 저장한 궁합 / 방명록에서 공통으로 사용 */
