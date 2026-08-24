@@ -954,12 +954,13 @@ document.getElementById('shareBtn').addEventListener('click', async ()=>{
   tryItBtn.classList.add('share-btn');
   tryItBtn.style.width = '100%';
 
-  // 궁합 보기를 결과 카드 맨 위로 옮김 (토글 없이 항상 펼쳐진 상태)
+  // 공유 링크로 들어온 사람에게만 궁합 보기를 보여주고, 결과 카드 맨 위로 옮김
   const resultCard = document.getElementById('result');
   const airmailEdge = resultCard.querySelector('.airmail-edge');
   const comparePanelEl = document.getElementById('comparePanel');
   const insertAfter = airmailEdge ? airmailEdge.nextSibling : resultCard.firstChild;
   resultCard.insertBefore(comparePanelEl, insertAfter);
+  comparePanelEl.classList.add('open');
 
   document.getElementById('fdate').value = `${b.slice(0,4)}-${b.slice(4,6)}-${b.slice(6,8)}`;
   document.getElementById('fname').value = name;
