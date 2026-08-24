@@ -274,7 +274,17 @@ noTimeChk.addEventListener('change', ()=>{
 
 document.getElementById('againBtn').addEventListener('click', ()=>{
   document.getElementById('result').classList.remove('show');
-  document.getElementById('formCard').scrollIntoView({behavior:'smooth', block:'start'});
+  const formCard = document.getElementById('formCard');
+  formCard.style.display = '';
+  if(openedViaShareLink){
+    document.getElementById('fdate').value = '';
+    document.getElementById('fname').value = '';
+    document.getElementById('trueSolar').checked = true;
+    noTimeChk.checked = false;
+    timeInput.value = '';
+    timeInput.disabled = false;
+  }
+  formCard.scrollIntoView({behavior:'smooth', block:'start'});
 });
 
 form.addEventListener('submit', (e)=>{
@@ -888,6 +898,10 @@ document.getElementById('shareBtn').addEventListener('click', async ()=>{
 
   compareClosedLabel = `${withWa(ownerLabel)} 궁합 보기`;
   document.getElementById('compareIntro').textContent = `${ownerLabel}의 사주와 내 사주를 비교해보려면, 내 생년월일을 넣어보세요.`;
+
+  // 링크로 들어온 경우 폼은 숨기고 공유한 사람의 결과만 보여줌
+  document.getElementById('formCard').style.display = 'none';
+  document.getElementById('againBtn').textContent = '🎁 나도 사주엽서 받아보기';
 
   // 링크로 들어온 경우, 궁합 보기를 결과 카드 맨 위로 옮기고 바로 펼쳐서 보여줌
   const resultCard = document.getElementById('result');
