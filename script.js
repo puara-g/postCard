@@ -578,6 +578,52 @@ function elemComplementText(nameA, nameB, chartA, chartB){
   return `서로 다른 기운을 갖고 있어요. 다름을 있는 그대로 즐기면 더 좋은 사이가 될 수 있어요.`;
 }
 
+/* 십성 관계 + 오행 상호보완을 바탕으로 계산하는 궁합 점수(60~99) */
+const SIPSEONG_SCORE_BASE = { "비겁":78, "식상":88, "재성":82, "관성":70, "인성":90 };
+function compatScore(chartA, chartB){
+  const ss = sipseongOf(chartA.dayStemIdx, chartB.dayStemIdx);
+  const group = SIPSEONG_GROUP[ss];
+  let score = group ? SIPSEONG_SCORE_BASE[group] : 75;
+
+  if(chartA.lackIdx>=0 && chartB.ohengCnt[chartA.lackIdx]>0 && chartB.dominantElemIdx===chartA.lackIdx){
+    score += 8;
+  } else if(chartB.lackIdx>=0 && chartA.ohengCnt[chartB.lackIdx]>0 && chartA.dominantElemIdx===chartB.lackIdx){
+    score += 8;
+  } else if(chartA.dominantElemIdx===chartB.dominantElemIdx){
+    score -= 4;
+  }
+
+  const wiggle = mod(chartA.dp.branchIdx*5 + chartB.dp.branchIdx*3 + chartB.dayStemIdx, 11) - 5;
+  score += wiggle;
+
+  return Math.max(60, Math.min(99, score));
+}
+
+/* 궁합 결과 카드 HTML — 궁합 보기 직후 / 저장한 궁합 / 방명록에서 공통으로 사용 */
+function compatDetailHTML(r){
+  const scoreHTML = (r.score!=null)
+    ? `<div class="compat-score">궁합 점수 <b>${r.score}</b><span class="unit">점</span></div>`
+    : '';
+  return `
+    <div class="compare-pair">
+      <div class="compare-person"><span class="stamp-mini">${r.stampA}</span><b>${r.pillarA}</b><span>${r.nameA}</span></div>
+      <div class="compare-link">＋</div>
+      <div class="compare-person"><span class="stamp-mini">${r.stampB}</span><b>${r.pillarB}</b><span>${r.nameB}</span></div>
+    </div>
+    ${scoreHTML}
+    <p>${r.relText}</p>
+    <p>${r.elemText}</p>
+    <p>${r.closing}</p>
+  `;
+}
+function showCompatDetail(r){
+  const out = document.getElementById('compareOutput');
+  out.innerHTML = compatDetailHTML(r);
+  out.classList.add('show');
+  document.getElementById('saveCompareBtn').classList.remove('show');
+  out.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
 const cNoTimeChk = document.getElementById('cNoTime');
 const cTimeInput = document.getElementById('cftime');
 cNoTimeChk.addEventListener('change', ()=>{
@@ -607,38 +653,30 @@ document.getElementById('compareForm').addEventListener('submit', (e)=>{
   const relText = group ? COMPAT_TEXT[group](nameA, nameB) : '';
   const elemText = elemComplementText(nameA, nameB, chartA, chartB);
   const closing = pick(COMPAT_CLOSING, chartB.dayStemIdx + chartB.dp.branchIdx);
+  const score = compatScore(chartA, chartB);
 
   const stampMap = ["🌱","🔥","⛰️","⚙️","🌊"];
   const pillarA = `${STEMS[chartA.dayStemIdx]}${BRANCHES[chartA.dp.branchIdx]}`;
   const pillarB = `${STEMS[chartB.dayStemIdx]}${BRANCHES[chartB.dp.branchIdx]}`;
-  document.getElementById('compareOutput').innerHTML = `
-    <div class="compare-pair">
-      <div class="compare-person"><span class="stamp-mini">${stampMap[chartA.dominantElemIdx]}</span><b>${pillarA}</b><span>${nameA}</span></div>
-      <div class="compare-link">＋</div>
-      <div class="compare-person"><span class="stamp-mini">${stampMap[chartB.dominantElemIdx]}</span><b>${pillarB}</b><span>${nameB}</span></div>
-    </div>
-    <p>${relText}</p>
-    <p>${elemText}</p>
-    <p>${closing}</p>
-  `;
-  document.getElementById('compareOutput').classList.add('show');
 
-  currentCompatRecord = {
+  const record = {
     nameA, nameB, pillarA, pillarB,
     stampA: stampMap[chartA.dominantElemIdx], stampB: stampMap[chartB.dominantElemIdx],
-    relText, elemText, closing
+    score, relText, elemText, closing
   };
+
+  const out = document.getElementById('compareOutput');
+  out.innerHTML = compatDetailHTML(record);
+  out.classList.add('show');
+
+  currentCompatRecord = record;
   const saveBtn = document.getElementById('saveCompareBtn');
   saveBtn.classList.add('show');
   saveBtn.disabled = false;
   saveBtn.textContent = '💾 이 궁합 저장하기';
 
   const today = new Intl.DateTimeFormat('ko-KR', { timeZone:'Asia/Seoul', year:'numeric', month:'2-digit', day:'2-digit' }).format(new Date());
-  publishCompatEntry({
-    forName: nameA, nameA, nameB, pillarA, pillarB,
-    stampA: stampMap[chartA.dominantElemIdx], stampB: stampMap[chartB.dominantElemIdx],
-    relText, elemText, closing, submittedAt: today
-  });
+  publishCompatEntry({ ...record, forName: nameA, submittedAt: today });
 });
 
 /* =======================================================
@@ -670,7 +708,7 @@ function renderSavedCompatList(){
   box.innerHTML = list.map((r,i)=>`
     <div class="saved-item" data-idx="${i}">
       <div class="si-main">
-        <span class="si-names">${r.stampA} ${r.pillarA} ${r.nameA} · ${r.stampB} ${r.pillarB} ${r.nameB}</span>
+        <span class="si-names">${r.stampA} ${r.pillarA} ${r.nameA} · ${r.stampB} ${r.pillarB} ${r.nameB}${r.score!=null ? ` · ${r.score}점` : ''}</span>
         <div class="si-date">${r.savedAt}</div>
       </div>
       <button type="button" class="si-del" aria-label="삭제" data-idx="${i}">✕</button>
@@ -683,19 +721,7 @@ function renderSavedCompatList(){
       const idx = Number(el.dataset.idx);
       const r = loadSavedCompat()[idx];
       if(!r) return;
-      document.getElementById('compareOutput').innerHTML = `
-        <div class="compare-pair">
-          <div class="compare-person"><span class="stamp-mini">${r.stampA}</span><b>${r.pillarA}</b><span>${r.nameA}</span></div>
-          <div class="compare-link">＋</div>
-          <div class="compare-person"><span class="stamp-mini">${r.stampB}</span><b>${r.pillarB}</b><span>${r.nameB}</span></div>
-        </div>
-        <p>${r.relText}</p>
-        <p>${r.elemText}</p>
-        <p>${r.closing}</p>
-      `;
-      document.getElementById('compareOutput').classList.add('show');
-      document.getElementById('saveCompareBtn').classList.remove('show');
-      document.getElementById('compareOutput').scrollIntoView({behavior:'smooth', block:'center'});
+      showCompatDetail(r);
     });
   });
   box.querySelectorAll('.si-del').forEach(btn=>{
@@ -744,6 +770,7 @@ function rowToCompatEntry(row){
     nameA: row.name_a, nameB: row.name_b,
     pillarA: row.pillar_a, pillarB: row.pillar_b,
     stampA: row.stamp_a, stampB: row.stamp_b,
+    score: (row.score===null || row.score===undefined) ? null : row.score,
     relText: row.rel_text, elemText: row.elem_text, closing: row.closing,
     submittedAt: row.submitted_at
   };
@@ -778,14 +805,26 @@ function renderCompatBook(){
     return;
   }
   emptyEl.style.display = 'none';
-  listEl.innerHTML = compatBook.map(r=>`
-    <div class="saved-item" style="cursor:default;">
+  const ranked = compatBook
+    .map((r,i)=>({ r, i }))
+    .sort((a,b)=> (b.r.score ?? -1) - (a.r.score ?? -1));
+  listEl.innerHTML = ranked.map(({r},rank)=>`
+    <div class="saved-item" data-idx="${compatBook.indexOf(r)}">
       <div class="si-main">
-        <span class="si-names">${r.stampA} ${r.pillarA} ${r.nameA} · ${r.stampB} ${r.pillarB} ${r.nameB}</span>
+        <span class="si-rank">${rank+1}위</span>
+        <span class="si-names">${r.stampA} ${r.pillarA} ${r.nameA} · ${r.stampB} ${r.pillarB} ${r.nameB}${r.score!=null ? ` · ${r.score}점` : ''}</span>
         <div class="si-date">${r.forName ? `${r.forName}님에게 남긴 궁합 · ` : ''}${r.submittedAt}</div>
       </div>
     </div>
   `).join('');
+  listEl.querySelectorAll('.saved-item').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const idx = Number(el.dataset.idx);
+      const r = compatBook[idx];
+      if(!r) return;
+      showCompatDetail(r);
+    });
+  });
 }
 loadCompatBook();
 
@@ -800,6 +839,7 @@ async function publishCompatEntry(entry){
       name_a: entry.nameA, name_b: entry.nameB,
       pillar_a: entry.pillarA, pillar_b: entry.pillarB,
       stamp_a: entry.stampA, stamp_b: entry.stampB,
+      score: entry.score ?? null,
       rel_text: entry.relText, elem_text: entry.elemText, closing: entry.closing,
       submitted_at: entry.submittedAt
     });

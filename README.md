@@ -25,6 +25,7 @@
      pillar_b text not null,
      stamp_a text not null,
      stamp_b text not null,
+     score integer,
      rel_text text not null,
      elem_text text not null,
      closing text not null,
@@ -39,6 +40,12 @@
 
    create policy "누구나 남기기" on compat_entries
      for insert with check (true);
+   ```
+
+   이미 이 테이블을 만든 적이 있다면(예: `score` 컬럼 추가 전에 만든 프로젝트), 아래 한 줄만 추가로 실행하면 됩니다.
+
+   ```sql
+   alter table compat_entries add column if not exists score integer;
    ```
 
 3. Project Settings → API에서 **Project URL**과 **anon public key**를 복사해 `supabase-config.js`에 넣습니다.
