@@ -564,14 +564,6 @@ function elemComplementText(nameA, nameB, chartA, chartB){
   return `서로 다른 기운을 갖고 있어요. 다름을 있는 그대로 즐기면 더 좋은 사이가 될 수 있어요.`;
 }
 
-const compareToggle = document.getElementById('compareToggle');
-const comparePanel = document.getElementById('comparePanel');
-let compareClosedLabel = '다른 사람과 궁합 보기';
-compareToggle.addEventListener('click', ()=>{
-  const open = comparePanel.classList.toggle('open');
-  compareToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-  document.getElementById('compareToggleLabel').textContent = open ? '접어두기' : compareClosedLabel;
-});
 const cNoTimeChk = document.getElementById('cNoTime');
 const cTimeInput = document.getElementById('cftime');
 cNoTimeChk.addEventListener('change', ()=>{
@@ -896,24 +888,24 @@ document.getElementById('shareBtn').addEventListener('click', async ()=>{
   const name = params.get('n') || '';
   const ownerLabel = name || '이 사람';
 
-  compareClosedLabel = `${withWa(ownerLabel)} 궁합 보기`;
   document.getElementById('compareIntro').textContent = `${ownerLabel}의 사주와 내 사주를 비교해보려면, 내 생년월일을 넣어보세요.`;
 
   // 링크로 들어온 경우 폼은 숨기고 공유한 사람의 결과만 보여줌
   document.getElementById('formCard').style.display = 'none';
-  document.getElementById('againBtn').textContent = '🎁 나도 사주엽서 받아보기';
 
-  // 링크로 들어온 경우, 궁합 보기를 결과 카드 맨 위로 옮기고 바로 펼쳐서 보여줌
+  // 공유하기 버튼 대신 "나도 받아보기" 버튼을 주 액션으로 보여줌
+  document.querySelector('.action-row').style.display = 'none';
+  const tryItBtn = document.getElementById('againBtn');
+  tryItBtn.textContent = '🎁 나도 사주엽서 받아보기';
+  tryItBtn.classList.add('share-btn');
+  tryItBtn.style.width = '100%';
+
+  // 궁합 보기를 결과 카드 맨 위로 옮김 (토글 없이 항상 펼쳐진 상태)
   const resultCard = document.getElementById('result');
   const airmailEdge = resultCard.querySelector('.airmail-edge');
-  const compareToggleEl = document.getElementById('compareToggle');
   const comparePanelEl = document.getElementById('comparePanel');
   const insertAfter = airmailEdge ? airmailEdge.nextSibling : resultCard.firstChild;
-  resultCard.insertBefore(compareToggleEl, insertAfter);
-  resultCard.insertBefore(comparePanelEl, compareToggleEl.nextSibling);
-  comparePanelEl.classList.add('open');
-  compareToggleEl.setAttribute('aria-expanded', 'true');
-  document.getElementById('compareToggleLabel').textContent = '접어두기';
+  resultCard.insertBefore(comparePanelEl, insertAfter);
 
   document.getElementById('fdate').value = `${b.slice(0,4)}-${b.slice(4,6)}-${b.slice(6,8)}`;
   document.getElementById('fname').value = name;
