@@ -811,8 +811,8 @@ function renderCompatBook(){
   listEl.innerHTML = ranked.map(({r},rank)=>`
     <div class="saved-item" data-idx="${compatBook.indexOf(r)}">
       <div class="si-main">
-        <span class="si-rank">${rank+1}위</span>
-        <span class="si-names">${r.stampA} ${r.pillarA} ${r.nameA} · ${r.stampB} ${r.pillarB} ${r.nameB}${r.score!=null ? ` · ${r.score}점` : ''}</span>
+        <span class="si-rank">${rank+1}위${r.score!=null ? ` · ${r.score}점` : ''}</span>
+        <span class="si-names">${r.stampA} ${r.pillarA} ${r.nameA} · ${r.stampB} ${r.pillarB} ${r.nameB}</span>
         <div class="si-date">${r.forName ? `${r.forName}님에게 남긴 궁합 · ` : ''}${r.submittedAt}</div>
       </div>
     </div>
