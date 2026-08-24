@@ -298,9 +298,23 @@ form.addEventListener('submit', (e)=>{
   const trueSolar = document.getElementById('trueSolar').checked;
   const name = document.getElementById('fname').value.trim();
 
-  const res = computeSaju({y,mo,d,h,mi,hasTime,trueSolar});
-  render(res, {y,mo,d,h,mi,hasTime,name});
+  const input = {y,mo,d,h,mi,hasTime,trueSolar,name};
+  saveSelfEntry(input);
+  const res = computeSaju(input);
+  render(res, input);
 });
+
+/* 한번 만든 결과는 이 브라우저에 저장해두고, 다시 방문하면 자동으로 불러옴 */
+const SELF_STORAGE_KEY = 'sajuyeopseo_self_v1';
+function saveSelfEntry(input){
+  try{ localStorage.setItem(SELF_STORAGE_KEY, JSON.stringify(input)); }catch(err){ /* 저장 불가 환경은 조용히 무시 */ }
+}
+function loadSelfEntry(){
+  try{
+    const raw = localStorage.getItem(SELF_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(err){ return null; }
+}
 
 function pillarChar(stemIdx, branchIdx){
   return { stem:STEMS[stemIdx], stemH:STEM_HANJA[stemIdx], branch:BRANCHES[branchIdx], branchH:BRANCH_HANJA[branchIdx],
@@ -921,4 +935,29 @@ document.getElementById('shareBtn').addEventListener('click', async ()=>{
 
   const res = computeSaju({y,mo,d,h,mi,hasTime,trueSolar});
   render(res, {y,mo,d,h,mi,hasTime,name});
+})();
+
+/* =======================================================
+   이전에 만든 결과 자동 불러오기 (공유 링크가 아닌 재방문일 때)
+   ======================================================= */
+(function restoreSelfEntry(){
+  if(openedViaShareLink) return;
+  const saved = loadSelfEntry();
+  if(!saved) return;
+  const { y, mo, d, h, mi, hasTime, trueSolar, name } = saved;
+
+  document.getElementById('fdate').value = `${y}-${pad2(mo)}-${pad2(d)}`;
+  document.getElementById('fname').value = name || '';
+  document.getElementById('trueSolar').checked = trueSolar;
+  if(hasTime){
+    timeInput.value = `${pad2(h)}:${pad2(mi)}`;
+    noTimeChk.checked = false;
+    timeInput.disabled = false;
+  } else {
+    noTimeChk.checked = true;
+    timeInput.disabled = true;
+  }
+
+  const res = computeSaju(saved);
+  render(res, saved);
 })();
