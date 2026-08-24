@@ -25,52 +25,7 @@
   --radius-sm: 10px;
 }
 
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg: #1B1728;
-    --bg-soft: #211C31;
-    --paper: #241F35;
-    --ink: #F1E9DD;
-    --ink-soft: #B6A9C4;
-    --line: #3B3350;
-    --accent: #FF8367;
-    --accent-ink: #241205;
-    --accent-soft: #402A2A;
-    --stripe-red: #E4634A;
-    --stripe-blue: #6FA9C9;
-    --stamp-bg: #2A2439;
-
-    --el-wood:  #7BC48C;
-    --el-fire:  #E4634A;
-    --el-earth: #D9A85C;
-    --el-metal: #C9BBA0;
-    --el-water: #7AA6D9;
-
-    --shadow: 0 16px 40px -18px rgba(0,0,0,0.55);
-  }
-}
-:root[data-theme="dark"]{
-  --bg: #1B1728;
-  --bg-soft: #211C31;
-  --paper: #241F35;
-  --ink: #F1E9DD;
-  --ink-soft: #B6A9C4;
-  --line: #3B3350;
-  --accent: #FF8367;
-  --accent-ink: #241205;
-  --accent-soft: #402A2A;
-  --stripe-red: #E4634A;
-  --stripe-blue: #6FA9C9;
-  --stamp-bg: #2A2439;
-
-  --el-wood:  #7BC48C;
-  --el-fire:  #E4634A;
-  --el-earth: #D9A85C;
-  --el-metal: #C9BBA0;
-  --el-water: #7AA6D9;
-
-  --shadow: 0 16px 40px -18px rgba(0,0,0,0.55);
-}
+/* 다크모드를 켠 사용자에게도 항상 라이트 테마로 고정 (의도적으로 다크 팔레트를 두지 않음) */
 
 *{ box-sizing:border-box; }
 html{ -webkit-text-size-adjust:100%; }
